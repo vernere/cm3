@@ -1,5 +1,12 @@
 const User = require("../models/userModel");
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+
+const GenerateToken = (_id) => {
+  return jwt.sign({ _id }, process.env.SECRET, {
+      expiresIn: "3d",
+  });
+}
 
 // @desc    Register new user
 // @route   POST /api/users/signup
@@ -26,7 +33,6 @@ const signupUser = async (req, res) => {
       !gender ||
       !date_of_birth ||
       !membership_status ||
-      !bio ||
       !address ||
       !profile_picture
     ) {
@@ -54,17 +60,13 @@ const signupUser = async (req, res) => {
       gender,
       date_of_birth,
       membership_status,
-      bio,
       address,
       profile_picture,
     });
 
     if (user) {
-      // console.log(user._id);
-
-    
-      res.status(201).json({ username });
-
+      const token = GenerateToken(user._id);
+      res.status(201).json({ username, token});
     } else {
       res.status(400);
       throw new Error("Invalid user data");
@@ -84,7 +86,8 @@ const loginUser = async (req, res) => {
     const user = await User.findOne({ username });
 
     if (user && (await bcrypt.compare(password, user.password))) {
-      res.status(200).json({ username });
+      const token = GenerateToken(user._id);
+      res.status(200).json({ username, token });
     } else {
       res.status(400);
       throw new Error("Invalid credentials");

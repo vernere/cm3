@@ -23,11 +23,9 @@ const App = () => {
               <Route path="/" element={<Home />} />
               <Route path="/add-job" element={<AddJobPage />} />
               <Route path="/jobs/:id" element={<JobPage />} />
-              <Route path="/login" element={<AddJobPage />} />
-              <Route path="/signup" element={<AddJobPage />} />
-              <Route path='*' element={<NotFoundPage />} />
               <Route path="/login" element={<Login />} />
-              <Route path="/signup" element={<Signup /> } />
+              <Route path="/signup" element={<Signup />} />
+              <Route path='*' element={<NotFoundPage />} />
             </Routes>
           </div>
         </BrowserRouter>

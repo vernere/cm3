@@ -2,6 +2,7 @@ require('dotenv').config()
 const express = require("express");
 const app = express();
 const jobRouter = require("./routes/jobRouter");
+const userRouter = require("./routes/userRouter");
 const { unknownEndpoint,errorHandler } = require("./middleware/customMiddleware");
 const connectDB = require("./config/db");
 const cors = require("cors");
@@ -15,6 +16,9 @@ connectDB();
 
 // Use the jobRouter for all "/jobs" routes
 app.use("/api/jobs", jobRouter);
+
+// Use the userRouter for all "/users" routes
+app.use("/api/users", userRouter);
 
 /*app.get('*', (req, res) => {
     res.sendFile(__dirname + '/view/index.html');

@@ -33,7 +33,11 @@ const JobPage = ({ isAuthenticated }) => {
   useEffect(() => {
     const fetchJob = async () => {
       try {
-        const res = await fetch(`/api/jobs/${id}`);
+        const res = await fetch(`/api/jobs/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         if (!res.ok) {
           throw new Error("Network response was not ok");
         }
@@ -47,7 +51,7 @@ const JobPage = ({ isAuthenticated }) => {
     };
 
     fetchJob();
-  }, [id]);
+  }, [id, token]);
 
   const onDeleteClick = (jobId) => {
     const confirm = window.confirm(

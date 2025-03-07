@@ -53,7 +53,11 @@ const EditJobPage = () => {
   useEffect(() => {
     const fetchJob = async () => {
       try {
-        const res = await fetch(`/api/jobs/${id}`);
+        const res = await fetch(`/api/jobs/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         if (!res.ok) {
           throw new Error("Network response was not ok");
         }
@@ -85,7 +89,7 @@ const EditJobPage = () => {
     };
 
     fetchJob();
-  }, [id]);
+  }, [id, token]);
 
   // Handle form submission
   const submitForm = async (e) => {

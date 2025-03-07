@@ -17,15 +17,11 @@ const AddJobPage = () => {
   const [requirements, setRequirements] = useState("");
 
   const navigate = useNavigate();
-
-  const getToken = () => {
-    // Replace this with your actual method of getting the token
-    return localStorage.getItem("token");
-  };
+  const user = JSON.parse(localStorage.getItem("user"));
+  const token = user ? user.token : null;
 
   const addJob = async (newJob) => {
     try {
-      const token = getToken();
       console.log("Adding job:", newJob);
       const res = await fetch("/api/jobs", {
         method: "POST",

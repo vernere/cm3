@@ -10,7 +10,7 @@ const { requireAuth } = require("../middleware/customMiddleware");
 
 const router = express.Router();
 
-router.get("/", requireAuth, getAllJobs);
+router.get("/", getAllJobs);
 router.post("/", requireAuth, createJob);
 router.get("/:jobId", requireAuth, getJobById);
 router.put("/:jobId", requireAuth, updateJob);

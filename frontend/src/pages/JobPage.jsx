@@ -8,16 +8,13 @@ const JobPage = ({ isAuthenticated }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const user = JSON.parse(localStorage.getItem("user"));
-  const token = user ? user.token : null;
+
 
   const deleteJob = async (id) => {
     try {
       const res = await fetch(`/api/jobs/${id}`, {
         method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        
       });
       if (!res.ok) {
         const errorText = await res.text();
@@ -82,14 +79,14 @@ const JobPage = ({ isAuthenticated }) => {
           <p><strong>Application deadline: </strong>{job.applicationDeadline}</p>
           <p><strong>Requirements: </strong>{job.requirements}</p>
 
-          {isAuthenticated && (
+          
             <>
               <button onClick={() => onDeleteClick(job._id)}>delete</button>
               <button onClick={() => navigate(`/edit-job/${job._id}`)}>
                 edit
               </button>
             </>
-          )}
+          
         </>
       )}
     </div>

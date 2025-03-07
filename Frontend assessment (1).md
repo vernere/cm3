@@ -1,207 +1,245 @@
-# Self-Assessment (Template)
+# Self-Assessment - Frontend
 
-### Example 1: Improving Code Quality
+## Refactoring the given example code to work with our new schema
 
-Initially, our `JobListings` component was functional but lacked proper error handling and feedback to the user. Here's the original implementation:
+Here is what part of the JobPage.jsx component looked like originally:
 
-```jsx
-// JobListings.jsx
-import { useState, useEffect } from 'react';
-import JobListing from './JobListing';
-
-const JobListings = ({ isHome = false }) => {
-    const [jobs, setJobs] = useState([]);
-
-    useEffect(() => {
-        const fetchJobs = async () => {
-            const apiUrl = isHome ? '/api/jobs?_limit=3' : '/api/jobs';
-            const res = await fetch(apiUrl);
-            const data = await res.json();
-            setJobs(data);
-        };
-
-        fetchJobs();
-    }, [isHome]);
-
-    return (
-        <section className='bg-blue-50 px-4 py-10'>
-            <div className='container-xl lg:container m-auto'>
-                <h2 className='text-3xl font-bold text-indigo-500 mb-6 text-center'>
-                    {isHome ? 'Recent Jobs' : 'Browse Jobs'}
-                </h2>
-                <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-                    {jobs.map((job) => (
-                        <JobListing key={job.id} job={job} />
-                    ))}
-                </div>
-            </div>
-        </section>
-    );
+```  return (
+    <div className="job-preview">
+      {loading ? (
+        <p>Loading...</p>
+      ) : error ? (
+        <p>{error}</p>
+      ) : (
+        <>
+          <h2>{job.title}</h2>
+          <p>Type: {job.type}</p>
+          <p>Description: {job.description}</p>
+          <p>Company: {job.company.name}</p>
+          <p>Email: {job.company.contactEmail}</p>
+          <p>Phone: {job.company.contactPhone}</p>
+          <button onClick={() => onDeleteClick(job._id)}>delete</button>
+        </>
+      )}
+    </div>
+  );
 };
-
-export default JobListings;
 ```
 
-The component worked for fetching and displaying jobs but did not handle loading states or errors effectively.
+This is what it looks like after refactoring it to work with our new schema and authentication:
 
-To address these issues, we refactored the code to include better error handling and loading states:
+```return (
+    <div className="job-preview">
+      {loading ? (
+        <p>Loading...</p>
+      ) : error ? (
+        <p>{error}</p>
+      ) : (
+        <>
+          <h2>{job.title}</h2>
+          <p><strong>Type: </strong>{job.type}</p>
+          <p><strong>Description: </strong>{job.description}</p>
+          <p><strong>Company: </strong>{job.company.name}</p>
+          <p><strong>Email: </strong>{job.company.contactEmail}</p>
+          <p><strong>Phone: </strong>{job.company.contactPhone}</p>
+          <p><strong>Website: </strong>{job.company.website}</p>
+          <p><strong>Employees: </strong>{job.company.size}</p>
+          <p><strong>Location: </strong>{job.location}</p>
+          <p><strong>Salary: </strong>{job.salary}€ per month</p>
+          <p><strong>Experience level: </strong>{job.experienceLevel}</p>
+          <p><strong>Posted: </strong>{job.postedDate}</p>
+          <p><strong>Status: </strong>{job.status}</p>
+          <p><strong>Application deadline: </strong>{job.applicationDeadline}</p>
+          <p><strong>Requirements: </strong>{job.requirements}</p>
 
-```jsx
-// Optimized JobListings.jsx
-import { useState, useEffect } from 'react';
-import JobListing from './JobListing';
-import Spinner from './Spinner';
-
-const JobListings = ({ isHome = false }) => {
-    const [jobs, setJobs] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const fetchJobs = async () => {
-            const apiUrl = isHome ? '/api/jobs?_limit=3' : '/api/jobs';
-            const token = localStorage.getItem('token'); // Assuming the token is stored in localStorage
-
-            try {
-                const res = await fetch(apiUrl, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                const data = await res.json();
-
-                if (data.length > 0) {
-                    setJobs(data);
-                }
-            } catch (error) {
-                console.log('Error fetching data', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchJobs();
-    }, [isHome]);
-
-    return (
-        <section className='bg-blue-50 px-4 py-10'>
-            <div className='container-xl lg:container m-auto'>
-                <h2 className='text-3xl font-bold text-indigo-500 mb-6 text-center'>
-                    {isHome ? 'Recent Jobs' : 'Browse Jobs'}
-                </h2>
-
-                {loading ? (
-                    <Spinner loading={loading} />
-                ) : (
-                    <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
-                        {jobs.length === 0 ? (
-                            <p className='text-center text-gray-500'>No jobs available at the moment.</p>
-                        ) : (
-                            jobs.map((job) => (
-                                <JobListing key={job.id} job={job} />
-                            ))
-                        )}
-                    </div>
-                )}
-            </div>
-        </section>
-    );
+          {isAuthenticated && (
+            <>
+              <button onClick={() => onDeleteClick(job._id)}>delete</button>
+              <button onClick={() => navigate(`/edit-job/${job._id}`)}>
+                edit
+              </button>
+            </>
+          )}
+        </>
+      )}
+    </div>
+  );
 };
-
-export default JobListings;
 ```
 
 ### Key Improvements:
-- **Loading State:** Added a loading state to show a spinner while fetching data.
-- **Error Handling:** Included error handling to log errors and provide feedback when no jobs are available.
+- **New schema:** It now uses the new schema for the job listing.
+- **Visual improvements:** Added small details to make the job listing to make more sense, such as using strong to make the field stand out from the information and in "Salary:" adding € per month to the end, so it isn't just a floating number.
+- **Authentication:** It now implements authentication checks before allowing a user to edit or delete a listing.
+- **Edit:** Allows a user to edit the listing if authenticated.
 
 ---
 
-### Example 2: Debugging Route Order in React Router
+## Implementing Login and Signup pages
 
-We encountered an issue with routing in our `App.jsx` file. Here's the problematic setup:
+We implemented functional login and signup pages to allow for user authentication.
 
-```jsx
-// Problematic route order in App.jsx
-import {
-    Route,
-    createBrowserRouter,
-    createRoutesFromElements,
-    RouterProvider,
-} from 'react-router-dom';
-import MainLayout from './layouts/MainLayout';
-import HomePage from './pages/HomePage';
-import JobsPage from './pages/JobsPage';
-import NotFoundPage from './pages/NotFoundPage';
-import JobPage, { jobLoader } from './pages/JobPage';
-import AddJobPage from './pages/AddJobPage';
-import EditJobPage from './pages/EditJobPage';
+### Login:
 
-const App = () => {
-    const router = createBrowserRouter(
-        createRoutesFromElements(
-            <Route path='/' element={<MainLayout />}>
-                <Route index element={<HomePage />} />
-                <Route path='/jobs' element={<JobsPage />} />
-                <Route path='/jobs/:id' element={<JobPage />} loader={jobLoader} />
-                <Route path='/add-job' element={<AddJobPage />} />
-                <Route path='/edit-job/:id' element={<EditJobPage />} loader={jobLoader} />
-                <Route path='*' element={<NotFoundPage />} />
-            </Route>
-        )
-    );
+```import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-    return <RouterProvider router={router} />;
+const Login = ({ setIsAuthenticated }) => {
+  const navigate = useNavigate();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+
+    const response = await fetch("/api/users/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password }),
+    });
+
+    const user = await response.json();
+
+    if (!response.ok) {
+      setError(user.error);
+      setIsLoading(false);
+      return;
+    }
+
+    localStorage.setItem("user", JSON.stringify(user));
+    setIsAuthenticated(true);
+    setIsLoading(false);
+    navigate("/");
+  };
+
+  return (
+    <div className="create">
+      <h2>Login</h2>
+      <form onSubmit={handleFormSubmit}>
+        <label>Username:</label>
+        <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required />
+
+        <label>Password:</label>
+        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+
+        {error && <p style={{ color: "red" }}>{error}</p>}
+        <button disabled={isLoading}>{isLoading ? "Logging in..." : "Sign in"}</button>
+      </form>
+    </div>
+  );
 };
 
-export default App;
+export default Login;
 ```
 
-Requests to `/jobs/:id` were evaluated before `/add-job` and `/edit-job/:id`, causing unexpected behavior.
+### Signup:
+```import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-### Solution:
-We reordered the routes to prioritize specific routes before dynamic ones:
+const Signup = ({ setIsAuthenticated }) => {
+  const navigate = useNavigate();
+  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [gender, setGender] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [membershipStatus, setMembershipStatus] = useState("");
+  const [bio, setBio] = useState("");
+  const [address, setAddress] = useState("");
+  const [profilePicture, setProfilePicture] = useState("");
+  const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-```jsx
-// Corrected route order in App.jsx
-import {
-    Route,
-    createBrowserRouter,
-    createRoutesFromElements,
-    RouterProvider,
-} from 'react-router-dom';
-import MainLayout from './layouts/MainLayout';
-import HomePage from './pages/HomePage';
-import JobsPage from './pages/JobsPage';
-import NotFoundPage from './pages/NotFoundPage';
-import JobPage, { jobLoader } from './pages/JobPage';
-import AddJobPage from './pages/AddJobPage';
-import EditJobPage from './pages/EditJobPage';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
 
-const App = () => {
-    const router = createBrowserRouter(
-        createRoutesFromElements(
-            <Route path='/' element={<MainLayout />}>
-                <Route index element={<HomePage />} />
-                <Route path='/jobs' element={<JobsPage />} />
-                <Route path='/add-job' element={<AddJobPage />} />
-                <Route path='/edit-job/:id' element={<EditJobPage />} loader={jobLoader} />
-                <Route path='/jobs/:id' element={<JobPage />} loader={jobLoader} />
-                <Route path='/login' element={<LoginPage />} />
-                <Route path='/register' element={<RegisterPage />} />
-                <Route path='*' element={<NotFoundPage />} />
-            </Route>
-        )
-    );
+    const response = await fetch("/api/users/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name,
+        username,
+        password,
+        phone_number: phoneNumber,
+        gender,
+        date_of_birth: dateOfBirth,
+        membership_status: membershipStatus,
+        bio,
+        address,
+        profile_picture: profilePicture,
+      }),
+    });
 
-    return <RouterProvider router={router} />;
+    const user = await response.json();
+
+    if (!response.ok) {
+      setError(user.error);
+      setIsLoading(false);
+      return;
+    }
+
+    localStorage.setItem("user", JSON.stringify(user));
+    setIsAuthenticated(true);
+    setIsLoading(false);
+    navigate("/");
+  };
+
+  return (
+    <div className="create">
+      <h2>Sign Up</h2>
+      <form onSubmit={handleFormSubmit}>
+        <label>Name:</label>
+        <input type="text" value={name} onChange={(e) => setName(e.target.value)} required />
+        
+        <label>Username:</label>
+        <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required />
+        
+        <label>Password:</label>
+        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        
+        <label>Phone Number:</label>
+        <input type="text" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} required />
+        
+        <label>Gender:</label>
+        <input type="text" value={gender} onChange={(e) => setGender(e.target.value)} required />
+        
+        <label>Date of Birth:</label>
+        <input type="date" value={dateOfBirth} onChange={(e) => setDateOfBirth(e.target.value)} required />
+        
+        <label>Membership Status:</label>
+        <input type="text" value={membershipStatus} onChange={(e) => setMembershipStatus(e.target.value)} required />
+        
+        <label>Bio:</label>
+        <textarea value={bio} onChange={(e) => setBio(e.target.value)} />
+        
+        <label>Address:</label>
+        <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} required />
+        
+        <label>Profile Picture (URL):</label>
+        <input type="text" value={profilePicture} onChange={(e) => setProfilePicture(e.target.value)} />
+
+        {error && <p style={{ color: "red" }}>{error}</p>}
+        <button disabled={isLoading}>{isLoading ? "Signing up..." : "Sign up"}</button>
+      </form>
+    </div>
+  );
 };
 
-export default App;
+export default Signup;
 ```
+
+### Key Improvements:
+- **Security:** This allows for a more secure way to ineract with our web application for users and the people making the job listings.
+- **Functionaloty:** Meets the given requirements and runs smoothly for the desired results!
 
 **Lessons Learned:**
 
-1. **Route Evaluation in React Router:** Routes are matched sequentially. Specific routes (e.g., `/add-job`) must be defined before dynamic ones (e.g., `/jobs/:id`).
-2. **Testing Matters:** Thorough testing revealed this subtle issue, which could have led to unpredictable behavior in production.
+1. **Consistent naming schemes:** If the variable names are inconsitent, everything will break. Making sure the naming schemes stay the same ensures that things run smoothly and can be easily updated in the future.
+2. **Testing at all stages:** Making sure to test our code at all stages to make sure the changes we have made haven't broken anything.

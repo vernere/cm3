@@ -6,7 +6,7 @@
 
 Here is what part of the JobPage.jsx component looked like originally:
 
-``````javascript
+```javascript
   return (
     <div className="job-preview">
       {loading ? (
@@ -31,7 +31,7 @@ Here is what part of the JobPage.jsx component looked like originally:
 
 This is what it looks like after refactoring it to work with our new schema and authentication:
 
-``````javascript
+```javascript
 return (
     <div className="job-preview">
       {loading ? (
@@ -85,7 +85,7 @@ We implemented functional login and signup pages to allow for user authenticatio
 
 ### Login:
 
-``````javascript
+```javascript
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -142,7 +142,7 @@ export default Login;
 ```
 
 ### Signup:
-``````javascript
+```javascript
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 

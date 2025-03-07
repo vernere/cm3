@@ -10,7 +10,7 @@ const cors = require("cors");
 // Middlewares
 app.use(cors())
 app.use(express.json());
-//app.use(express.static('view'));
+app.use(express.static('dist'));
 
 connectDB();
 
@@ -20,9 +20,9 @@ app.use("/api/jobs", jobRouter);
 // Use the userRouter for all "/users" routes
 app.use("/api/users", userRouter);
 
-/*app.get('*', (req, res) => {
-    res.sendFile(__dirname + '/view/index.html');
-  });*/
+app.get('*', (req, res) => {
+    res.sendFile(__dirname + '/dist/index.html');
+  });
 
 app.use(unknownEndpoint);
 app.use(errorHandler);

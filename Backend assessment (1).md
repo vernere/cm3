@@ -1,69 +1,208 @@
 # Self-Assessment (Template)
 
-### Example 1: Improving Code Quality
+### Overview
 
-Initially, our `createJob` function was functional but lacked proper error handling and feedback to the user. Here's the original implementation:
+Overall the process for creating backend code was really straight forward for `userController.js`, `jobController.js` and `requireAuth` in `/middleware/customMiddleware.js`.
+
+for `requreAuth`, We followed a familiar pattern similar to our project implementation and implementations to previous code marathons.
 
 ```javascript
-// Create job post
-const createJob = async (req, res) => {
-    const { title, type, location, description, salary, company } = req.body;
+const requireAuth = async (req, res, next) => {
+  // verify user is authenticated
+  const { authorization } = req.headers;
 
-    try {
-        const job = await Job.create({ title, type, location, description, salary, company });
-        res.status(200).json({ job });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+  if (!authorization) {
+    return res.status(401).json({ error: "Authorization token required" });
+  }
+
+  const token = authorization.split(" ")[1]; // seperating the token from the Bearer keyword
+
+  try {
+    const { _id } = jwt.verify(token, process.env.SECRET);
+
+    req.user = await User.findOne({ _id }).select("username");
+    console.log(req.user);
+
+    next();
+  } catch (error) {
+    console.log(error);
+    res.status(401).json({ error: "Request is not authorized" });
+  }
 };
 ```
 
-The function worked for creating jobs but did not provide meaningful feedback or handle validation errors effectively.
-
-To address these issues, we refactored the code to include better error handling and validation:
+As for all the controllers, we followed a basic approach. We used the `try-catch` block to handle errors and return the appropriate response to the user.
 
 ```javascript
-// Optimized createJob
 const createJob = async (req, res) => {
-    const { title, type, location, description, salary, company } = req.body;
+  try {
+    const { title, type, description, location, salary, experienceLevel, postedDate, status, applicationDeadline, requirements, company } = req.body;
 
+    if (!title || !type || !description || !location || !salary) {
+      return res.status(400).json({ message: "Please provide all required fields" });
+    }
+    
+    const newJob = new Job({
+      title,
+      type, 
+      description, 
+      location, 
+      salary, 
+      experienceLevel, 
+      postedDate, 
+      status, 
+      applicationDeadline,
+      requirements,
+      company
+    });
+    
+    const savedJob = await newJob.save();
+    res.status(201).json(savedJob);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+```
+
+For `signupUser` our initial code was a bit messy and 'annoying' to read and had bad practices such as the user variables being declared outside the `try-catch` block. We had to refactor the code to make it more readable and easier to understand.
+
+Here is the initial code:
+```javascript
+const signupUser = async (req, res) => {
+  const {
+    name,
+    username,
+    password,
+    phone_number,
+    gender,
+    date_of_birth,
+    membership_status,
+    bio,
+    address,
+    profile_picture,
+  } = req.body;
+  try {
+    if (
+      !name ||
+      !username ||
+      !password ||
+      !phone_number ||
+      !gender ||
+      !date_of_birth ||
+      !membership_status ||
+      !address ||
+      !profile_picture
+    ) {
+      res.status(400);
+      throw new Error("Please add all fields");
+    }
+    // Check if user exists
+    const userExists = await User.findOne({ username });
+
+    if (userExists) {
+      res.status(400);
+      throw new Error("User already exists");
+    }
+
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Create user
+    const user = await User.create({
+      name,
+      username,
+      password: hashedPassword,
+      phone_number,
+      gender,
+      date_of_birth,
+      membership_status,
+      address,
+      bio,
+      profile_picture,
+    });
+
+    if (user) {
+      const token = GenerateToken(user._id);
+      res.status(201).json({ username, token});
+    } else {
+      res.status(400);
+      throw new Error("Invalid user data");
+    }
+
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+```
+
+After refactoring, the code looked like this:
+```javascript
+const signupUser = async (req, res) => {
     try {
-        const job = await Job.createJobPost(title, type, location, description, salary, company);
-        res.status(200).json({ job });
+        const {
+            name,
+            username,
+            password,
+            phone_number,
+            gender,
+            date_of_birth,
+            membership_status,
+            bio,
+            address,
+            profile_picture,
+        } = req.body;
+
+        if (!name || !username || !password || !phone_number || !gender || !date_of_birth || !membership_status || !address || !profile_picture) {
+            res.status(400);
+            throw new Error("Please add all fields");
+        }
+
+        // Check if user exists
+        const userExists = await User.findOne({ username });
+
+        if (userExists) {
+            res.status(400);
+            throw new Error("User already exists");
+        }
+
+        // Hash password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        // Create user
+        const user = await User.create({
+            name,
+            username,
+            password: hashedPassword,
+            phone_number,
+            gender,
+            date_of_birth,
+            membership_status,
+            address,
+            bio,
+            profile_picture,
+        });
+
+        if (user) {
+            const token = GenerateToken(user._id);
+            res.status(201).json({ username, token});
+        } else {
+            res.status(400);
+            throw new Error("Invalid user data");
+        }
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
 };
 ```
 
-### Key Improvements:
-- **Error Handling:** Added specific error messages for validation failures.
-- **User Feedback:** Used `res.status(400).json` to provide meaningful feedback to the user.
-
----
-
-### Example 2: Debugging Route Order in Express
-
-We encountered an issue with routing in our `jobRouter.js` file. Here's the problematic setup:
-
-```javascript
-// Problematic route order
-router.get('/:id', getJob);
-router.get('/', getAllJobs);
-```
-
-Requests to `/api/jobs` returned "Invalid ID" errors because Express evaluated the dynamic `/:id` route before `/`.
-
-### Solution:
-We reordered the routes to prioritize specific routes before dynamic ones:
-
-```javascript
-// Corrected route order
-router.get('/', getAllJobs);
-router.get('/:id', getJob);
-```
+### Challenges
+Our challenges revolved mainly around git and peoples unfamiliarity with the git workflow. We had to spend a lot of time explaining how to use git and how to resolve conflicts.
 
 **Lessons Learned:**
 
-1. **Route Evaluation in Express:** Routes are matched sequentially. Specific routes (e.g., `/`) must be defined before dynamic ones (e.g., `/:id`).
-2. **Testing Matters:** Thorough testing revealed this subtle issue, which could have led to unpredictable behavior in production.
+1. **Git Workflow:** It's essential to ensure that all team members are familiar with the git workflow to avoid conflicts and ensure smooth collaboration.
+2. **Error Handling:** Proper error handling is crucial to provide meaningful feedback to users and developers.
+3. **Testing:** Thorough testing helps identify issues early and ensures code quality.
+4. **User input validation in the backend:** While we didn't have much in terms of input validation in the backend. we did notice how important t is important to validate user input to prevent errors and ensure data integrity in the backend.

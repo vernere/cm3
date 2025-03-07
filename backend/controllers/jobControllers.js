@@ -1,42 +1,18 @@
-const mongoose = require("mongoose");
 const Job = require("../models/jobModel");
+const mongoose = require("mongoose");
 
-// Get all jobs
+//GET / jobs;
 const getAllJobs = async (req, res) => {
-
-
-  try {
-    const jobs = await Job.find({ }).sort({ createdAt: -1 });
-    res.status(200).json(jobs);
-  } catch (error) {
-    console.error("Error fetching jobs:", error);
-    res.status(500).json({ error: "Server Error" });
-
   try {
     const jobs = await Job.find();
     res.json(jobs);
   } catch (error) {
     res.status(500).json({ message: error.message });
-
   }
 };
 
-// Create a new job
+// POST /jobs
 const createJob = async (req, res) => {
-
-
-  try {
-    const user_id = req.user._id;
-    const newJob = new Job({
-      ...req.body,
-      user_id,
-    });
-    await newJob.save();
-    res.status(201).json(newJob);
-  } catch (error) {
-    console.error("Error creating job:", error);
-    res.status(500).json({ error: "Server Error" });
-
   try {
     const { title, type, description, location, salary, experienceLevel, postedDate, status, applicationDeadline, requirements, company } = req.body;
 
@@ -62,29 +38,11 @@ const createJob = async (req, res) => {
     res.status(201).json(savedJob);
   } catch (error) {
     res.status(500).json({ message: error.message });
-
   }
 };
 
-// Get job by ID
+// GET /jobs/:jobId
 const getJobById = async (req, res) => {
-
-  const { jobId } = req.params;
-  if (!mongoose.Types.ObjectId.isValid(jobId)) {
-    return res.status(404).json({ error: "No such job" });
-  }
-
-  try {
-    const job = await Job.findById(jobId);
-    if (!job) {
-      console.log("Job not found");
-      return res.status(404).json({ message: "Job not found" });
-    }
-    res.status(200).json(job);
-  } catch (error) {
-    console.error("Error fetching job:", error);
-    res.status(500).json({ error: "Server Error" });
-
   try {
     const jobId = req.params.jobId;
 
@@ -105,33 +63,11 @@ const getJobById = async (req, res) => {
   }
   catch (error) {
     res.status(500).json({ message: error.message });
-
   }
 };
 
-// Update job by ID
+// PUT /jobs/:jobId
 const updateJob = async (req, res) => {
-
-  const { jobId } = req.params;
-  if (!mongoose.Types.ObjectId.isValid(jobId)) {
-    return res.status(404).json({ error: "No such job" });
-  }
-
-  try {
-    // const user_id = req.user._id;
-    const job = await Job.findOneAndUpdate(
-      { _id: jobId },
-      { ...req.body },
-      { new: true }
-    );
-    if (!job) {
-      return res.status(404).json({ message: "Job not found" });
-    }
-    res.status(200).json(job);
-  } catch (error) {
-    console.error("Error updating job:", error);
-    res.status(500).json({ error: "Server Error" });
-
   try {
     const jobId = req.params.jobId;
 
@@ -166,29 +102,11 @@ const updateJob = async (req, res) => {
     res.json(updatedJob);
   } catch (error) {
     res.status(500).json({ message: error.message });
-
   }
 };
 
-// Delete job by ID
+// DELETE /jobs/:jobId
 const deleteJob = async (req, res) => {
-
-  const { jobId } = req.params;
-  if (!mongoose.Types.ObjectId.isValid(jobId)) {
-    return res.status(404).json({ error: "No such job" });
-  }
-
-  try {
-    // const user_id = req.user._id;
-    const job = await Job.findOneAndDelete({ _id: jobId });
-    if (!job) {
-      return res.status(404).json({ message: "Job not found" });
-    }
-    res.status(204).send(); // 204 No Content
-  } catch (error) {
-    console.error("Error deleting job:", error);
-    res.status(500).json({ error: "Server Error" });
-=======
   try {
     const jobId = req.params.jobId;
 
@@ -211,14 +129,13 @@ const deleteJob = async (req, res) => {
     res.json({ message: "Job deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
-
   }
 };
 
 module.exports = {
   getAllJobs,
-  createJob,
   getJobById,
+  createJob,
   updateJob,
   deleteJob,
 };

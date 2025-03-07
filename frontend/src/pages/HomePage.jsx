@@ -29,7 +29,7 @@ const Home = () => {
     <div className="home">
       {error && <div>{error}</div>}
       {isPending && <div>Loading...</div>}
-      {jobs && <JobListings jobs={sampleJobs} />}
+      {jobs && <JobListings jobs={jobs} />}
     </div>
   );
 };

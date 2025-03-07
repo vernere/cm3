@@ -11,7 +11,7 @@
     "data:destroy": "node seeder -d",
     "build:view": "rm -rf view && cd ../frontend && npm run build && cd -r dist ../backend/view",
     "push": "git add . && git commit -m \"update frontend\"  && git push",
-    "deploy" : "npm run build:view && npm run push"
+    "deploy": "npm run build:view && npm run push"
   },
   "keywords": [],
   "author": "",
@@ -21,10 +21,11 @@
     "globalTeardown": "./tests/teardown.js"
   },
   "dependencies": {
-    "cross-env": "^7.0.3",
+    "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "colors": "^1.4.0",
     "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
     "dotenv": "^16.4.5",
     "express": "^4.21.0",
     "jsonwebtoken": "^9.0.2",

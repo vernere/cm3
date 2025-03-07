@@ -103,6 +103,13 @@ const EditJobPage = () => {
         website: companyWebsite,
         size: companySize,
       },
+      location,
+      salary,
+      experienceLevel,
+      postedDate,
+      status,
+      applicationDeadline,
+      requirements,
     };
 
     const success = await updateJob(updatedJob);
@@ -197,6 +204,13 @@ const EditJobPage = () => {
                     <option value="Mid">Mid</option>
                     <option value="Senior">Senior</option>
                 </select>
+
+            <label>Posted Date:</label>
+            <input
+                type="date"
+                value={postedDate}
+                onChange={(e) => setPostedDate(e.target.value)}
+            />
             <label>Status:</label>
                 <select value={experienceLevel} onChange={(e) => setType(e.target.value)}>
                     <option value="Open">Open</option>

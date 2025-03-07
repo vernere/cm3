@@ -7,7 +7,10 @@ import Navbar from "./components/Navbar";
 //import LoginPage from  "./pages/LoginPage";
 //import SignupPage from   "./pages/SignupPage";
 import NotFoundPage from "./pages/NotFoundPage"
+import Login from "./pages/login";
+import Signup from "./pages/Signup";
 import JobPage from "./pages/JobPage";
+
 
 const App = () => {
 
@@ -23,6 +26,8 @@ const App = () => {
               <Route path="/login" element={<AddJobPage />} />
               <Route path="/signup" element={<AddJobPage />} />
               <Route path='*' element={<NotFoundPage />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup /> } />
             </Routes>
           </div>
         </BrowserRouter>

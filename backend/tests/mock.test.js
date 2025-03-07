@@ -7,6 +7,8 @@ const { compare } = require("bcryptjs");
 jest.mock("../models/jobModel");
 
 describe("Job Controller", () => {
+  const token = "your-test-token"; // Replace with a valid test token
+
   afterEach(() => {
     jest.clearAllMocks();
   });
@@ -16,7 +18,10 @@ describe("Job Controller", () => {
       const mockJobs = [{ title: "Developer" }, { title: "Designer" }];
       Job.find.mockResolvedValue(mockJobs);
 
-      const res = await request(app).get("/api/jobs");
+      const res = await request(app)
+        .get("/api/jobs")
+        .set("Authorization", `Bearer ${token}`);
+      
       expect(res.status).toBe(200);
       expect(res.body).toEqual(mockJobs);
     });
@@ -40,7 +45,11 @@ describe("Job Controller", () => {
 
       Job.prototype.save = jest.fn().mockResolvedValue(newJob);
 
-      const res = await request(app).post("/api/jobs").send(newJob);
+      const res = await request(app)
+        .post("/api/jobs")
+        .set("Authorization", `Bearer ${token}`)
+        .send(newJob);
+      
       expect(res.status).toBe(201);
       expect(res.body).toEqual(newJob);
     });
@@ -51,7 +60,10 @@ describe("Job Controller", () => {
       const mockJob = { _id: "605c72cfcf1b2c001f8e4c6b", title: "Tester" };
       Job.findById.mockResolvedValue(mockJob);
 
-      const res = await request(app).get(`/api/jobs/${mockJob._id}`);
+      const res = await request(app)
+        .get(`/api/jobs/${mockJob._id}`)
+        .set("Authorization", `Bearer ${token}`);
+      
       expect(res.status).toBe(200);
       expect(res.body).toEqual(mockJob);
     });
@@ -78,7 +90,11 @@ describe("Job Controller", () => {
 
       Job.findById.mockResolvedValue({ ...mockJob, save: jest.fn().mockResolvedValue(updatedJob) });
 
-      const res = await request(app).put(`/api/jobs/${mockJob._id}`).send(updatedJob);
+      const res = await request(app)
+        .put(`/api/jobs/${mockJob._id}`)
+        .set("Authorization", `Bearer ${token}`)
+        .send(updatedJob);
+      
       expect(res.status).toBe(200);
       expect(res.body).toEqual(updatedJob);
     });
@@ -89,7 +105,10 @@ describe("Job Controller", () => {
       const jobId = "605c72cfcf1b2c001f8e4c6b";
       Job.findById.mockResolvedValue({ deleteOne: jest.fn() });
 
-      const res = await request(app).delete(`/api/jobs/${jobId}`);
+      const res = await request(app)
+        .delete(`/api/jobs/${jobId}`)
+        .set("Authorization", `Bearer ${token}`);
+      
       expect(res.status).toBe(200);
       expect(res.body).toEqual({ message: "Job deleted successfully" });
     });

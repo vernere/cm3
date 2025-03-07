@@ -1,5 +1,12 @@
 const User = require("../models/userModel");
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+
+const GenerateToken = (id) => {
+    return jwt.sign({ id }, process.env.SECRET, {
+        expiresIn: "3d",
+    });
+}
 
 // @desc    Register new user
 // @route   POST /api/users/signup
@@ -62,8 +69,8 @@ const signupUser = async (req, res) => {
     if (user) {
       // console.log(user._id);
 
-    
-      res.status(201).json({ username });
+      const token = GenerateToken(user._id);
+        res.status(201).json({ username, token });
 
     } else {
       res.status(400);
@@ -84,7 +91,8 @@ const loginUser = async (req, res) => {
     const user = await User.findOne({ username });
 
     if (user && (await bcrypt.compare(password, user.password))) {
-      res.status(200).json({ username });
+      const token = GenerateToken(user._id);
+      res.status(200).json({ username, token });
     } else {
       res.status(400);
       throw new Error("Invalid credentials");

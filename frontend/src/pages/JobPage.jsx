@@ -75,7 +75,7 @@ const JobPage = ({ isAuthenticated }) => {
           <p><strong>Website: </strong>{job.company.website}</p>
           <p><strong>Employees: </strong>{job.company.size}</p>
           <p><strong>Location: </strong>{job.location}</p>
-          <p><strong>Salary: </strong>{job.salary}</p>
+          <p><strong>Salary: </strong>{job.salary}€ per month</p>
           <p><strong>Experience level: </strong>{job.experienceLevel}</p>
           <p><strong>Posted: </strong>{job.postedDate}</p>
           <p><strong>Status: </strong>{job.status}</p>

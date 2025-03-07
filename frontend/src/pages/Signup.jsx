@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import useSignup from "../hooks/useSignup";
 
 const Signup = ({ setIsAuthenticated }) => {
   const navigate = useNavigate();
@@ -13,43 +14,31 @@ const Signup = ({ setIsAuthenticated }) => {
   const [bio, setBio] = useState("");
   const [address, setAddress] = useState("");
   const [profilePicture, setProfilePicture] = useState("");
-  const [error, setError] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+
+  const { signup, error, loading } = useSignup();
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
-    setError(null);
 
-    const response = await fetch("/api/users/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name,
-        username,
-        password,
-        phone_number: phoneNumber,
-        gender,
-        date_of_birth: dateOfBirth,
-        membership_status: membershipStatus,
-        bio,
-        address,
-        profile_picture: profilePicture,
-      }),
-    });
+    const userData = {
+      name,
+      username,
+      password,
+      phone_number: phoneNumber,
+      gender,
+      date_of_birth: dateOfBirth,
+      membership_status: membershipStatus,
+      bio,
+      address,
+      profile_picture: profilePicture,
+    };
 
-    const user = await response.json();
+    const user = await signup(userData);
 
-    if (!response.ok) {
-      setError(user.error);
-      setIsLoading(false);
-      return;
+    if (user) {
+      setIsAuthenticated(true);
+      navigate("/");
     }
-
-    localStorage.setItem("user", JSON.stringify(user));
-    setIsAuthenticated(true);
-    setIsLoading(false);
-    navigate("/");
   };
 
   return (
@@ -87,7 +76,7 @@ const Signup = ({ setIsAuthenticated }) => {
         <input type="text" value={profilePicture} onChange={(e) => setProfilePicture(e.target.value)} />
 
         {error && <p style={{ color: "red" }}>{error}</p>}
-        <button disabled={isLoading}>{isLoading ? "Signing up..." : "Sign up"}</button>
+        <button disabled={loading}>{loading ? "Signing up..." : "Sign up"}</button>
       </form>
     </div>
   );

@@ -33,7 +33,6 @@ const signupUser = async (req, res) => {
       !gender ||
       !date_of_birth ||
       !membership_status ||
-      !bio ||
       !address ||
       !profile_picture
     ) {
@@ -61,7 +60,6 @@ const signupUser = async (req, res) => {
       gender,
       date_of_birth,
       membership_status,
-      bio,
       address,
       profile_picture,
     });
@@ -93,6 +91,7 @@ const loginUser = async (req, res) => {
     if (user && (await bcrypt.compare(password, user.password))) {
       const token = GenerateToken(user._id);
       res.status(200).json({ username, token });
+      res.status(200).json({ username });
     } else {
       res.status(400);
       throw new Error("Invalid credentials");

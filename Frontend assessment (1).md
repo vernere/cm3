@@ -1,6 +1,6 @@
-``````markdown
+
 # Self-Assessment - Frontend
-```````
+
 
 ## Refactoring the given example code to work with our new schema
 

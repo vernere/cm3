@@ -5,6 +5,7 @@ import Home from "./pages/HomePage";
 import AddJobPage from "./pages/AddJobPage";
 import Navbar from "./components/Navbar";
 import NotFoundPage from "./pages/NotFoundPage"
+import JobPage from "./pages/JobPage";
 
 const App = () => {
 
@@ -16,6 +17,7 @@ const App = () => {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/add-job" element={<AddJobPage />} />
+              <Route path="/jobs/:id" element={<JobPage />} />
               <Route path='*' element={<NotFoundPage />} />
             </Routes>
           </div>

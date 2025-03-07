@@ -1,3 +1,5 @@
+const mongoose = require('mongoose');
+
 const userSchema = new Schema({
     name: { type: String, required: true },
     username: { type: String, required: true, unique: true },
@@ -10,3 +12,5 @@ const userSchema = new Schema({
     address: { type: String, required: true },
     profile_picture: { type: String, required: false }
 }, { timestamps: true, versionKey: false });
+
+module.exports = mongoose.model('User', userSchema);

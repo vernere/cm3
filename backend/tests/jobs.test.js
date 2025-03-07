@@ -7,7 +7,7 @@ const { compare } = require("bcryptjs");
 jest.mock("../models/jobModel");
 
 describe("Job Controller", () => {
-  const token = "your-test-token"; // Replace with a valid test token
+  const token = "your-token"; // Replace with a valid test token
 
   afterEach(() => {
     jest.clearAllMocks();

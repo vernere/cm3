@@ -2,8 +2,8 @@ const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
-const GenerateToken = (id) => {
-  return jwt.sign({ id }, process.env.SECRET, {
+const GenerateToken = (_id) => {
+  return jwt.sign({ _id }, process.env.SECRET, {
       expiresIn: "3d",
   });
 }
@@ -65,11 +65,8 @@ const signupUser = async (req, res) => {
     });
 
     if (user) {
-      // console.log(user._id);
-
       const token = GenerateToken(user._id);
-        res.status(201).json({ username, token });
-
+      res.status(201).json({ username, token});
     } else {
       res.status(400);
       throw new Error("Invalid user data");

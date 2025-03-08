@@ -12,3 +12,4 @@
 
 Indicate how many points the group deserves for this coding marathon : Group 7 deserves 200 points.
 
+Update! Finnished with adding hooks, commited to ghub and deployed! Group 7 deserves 220 points.
